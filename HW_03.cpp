@@ -52,14 +52,14 @@ struct DATE {
 };
 
 struct NAME {
-	string lName="";//ho
-	string mName="";//ten lot
+	string lName = "";//ho
+	string mName = "";//ten lot
 	string fName = "";//ten
 	NAME() {};
 	NAME(string name) {
 		vector<string> tmp;
 		string temp = "";
-		
+
 		for (int i = 0; i < name.size(); i++)
 		{
 			if (name[i] != ' ')
@@ -69,25 +69,26 @@ struct NAME {
 			else
 			{
 				tmp.push_back(temp);
+				temp = "";
 			}
 		};
 
 		lName = tmp[0];
-		for (int i = 0; i <= tmp.size() - 2; i++)
+		for (int i = 1; i <= tmp.size() - 2; i++)
 		{
 			mName += tmp[i] + ' ';
-		}; 
+		};
 		fName = tmp[tmp.size() - 1];
 	}
 };
 
 struct Student {
 	string idStu = "";
-	string nameStu = "";
+	NAME nameStu;
 	DATE birthday;
 	float point{};
 	Student() {};
-	Student(string id, string name, DATE birth, float p) {
+	Student(string id, NAME name, DATE birth, float p) {
 		idStu = id;
 		nameStu = name;
 		birthday = birth;
@@ -109,7 +110,7 @@ struct node_list {
 
 #pragma region listFuncs
 node* init_node(St a);
-node_list* add_new_node(node_list l, St a);
+node_list* add_new_node(node_list* l, St a);
 node_list* init_list();
 void WriteToFile(node* l);
 void separateStr(string inp, string& id, string& name, string& birthday, float& point);
@@ -147,7 +148,7 @@ node_list* init_list() {
 
 	cin >> id >> name >> birthday >> point;
 
-	St a = St(id, name, DATE(birthday), point);
+	St a = St(id, NAME(name), DATE(birthday), point);
 	node_list* l = new node_list;
 	l->head = init_node(a);
 	l->tail = l->head;
@@ -156,7 +157,7 @@ node_list* init_list() {
 	for (int i = 1; i < size; i++)
 	{
 		cin >> id >> name >> birthday >> point;
-		a = St(id, name, DATE(birthday), point);
+		a = St(id, NAME(name), DATE(birthday), point);
 		p = add_new_node(p, a);
 	}
 	return l;
@@ -166,7 +167,7 @@ void WriteToFile(node* l) {
 	node* p = l;
 	while (p != NULL)
 	{
-		fileOutput << p->Data.idStu << " " << p->Data.nameStu << " " << printDate(p->Data.birthday) << " " << p->Data.point << endl;
+		fileOutput << p->Data.idStu << " " << printName(p->Data.nameStu) << " " << printDate(p->Data.birthday) << " " << p->Data.point << endl;
 		p = p->next;
 	}
 	fileOutput.close();
@@ -196,7 +197,7 @@ void separateStr(string inp, string& id, string& name, string& birthday, float& 
 		name += temp[i] + " ";
 	};
 	birthday = temp[temp.size() - 2];
-	
+
 	stringstream ss;
 	ss << temp[temp.size() - 1];
 	ss >> point;
@@ -210,7 +211,7 @@ node_list* ReadFromFile() {
 	getline(fileInput, t);
 	separateStr(t, id, name, birthday, point);
 
-	St a = St(id, name, DATE(birthday), point);
+	St a = St(id, NAME(name), DATE(birthday), point);
 	node_list* l = new node_list;
 	l->head = init_node(a);
 	l->tail = l->head;
@@ -220,7 +221,7 @@ node_list* ReadFromFile() {
 	while (!fileInput.eof()) {
 		getline(fileInput, t);
 		separateStr(t, id, name, birthday, point);
-		a = St(id, name, DATE(birthday), point);
+		a = St(id, NAME(name), DATE(birthday), point);
 		p = add_new_node(p, a);
 	};
 	fileInput.close();
@@ -253,14 +254,14 @@ void student_with_max_point(node* l) {
 	{
 		if (p->Data.point == max)
 		{
-			fileOutput << p->Data.idStu << " " << p->Data.nameStu << " " << printDate(p->Data.birthday) << " " << p->Data.point << endl;
+			fileOutput << p->Data.idStu << " " << printName(p->Data.nameStu) << " " << printDate(p->Data.birthday) << " " << p->Data.point << endl;
 		};
 		p = p->next;
 	}
 	fileOutput.close();
 };
 
-void sortPoint(node_list*l) {
+void sortPoint(node_list* l) {
 	node* temp = l->head;
 
 	while (temp != NULL)
@@ -281,7 +282,7 @@ void sortPoint(node_list*l) {
 }
 
 void sortName(node_list* l) {
-	
+
 }
 
 string printDate(DATE d) {
@@ -293,7 +294,7 @@ string printName(NAME n) {
 }
 
 void printInfo(node* d) {
-	cout << d->Data.idStu << " " << d->Data.nameStu << " " << printDate(d->Data.birthday) << " " << d->Data.point << endl;
+	cout << d->Data.idStu << " " << printName(d->Data.nameStu) << " " << printDate(d->Data.birthday) << " " << d->Data.point << endl;
 }
 
 void printList(node_list* l) {
