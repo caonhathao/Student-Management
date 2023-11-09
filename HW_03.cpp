@@ -3,7 +3,11 @@
 #include<fstream>
 #include<sstream>
 #include<string>
+#include<iomanip>
 
+using std::setw;
+using std::left;
+using std::right;
 using std::cin;
 using std::cout;
 using std::string;
@@ -17,6 +21,8 @@ using std::ios;
 
 ofstream fileOutput("Data_OUT.txt", ios::out);
 ifstream fileInput("Data_INP.txt", ios::in);
+
+string strName, strDay = "";
 
 struct DATE {
 	int day = 0;
@@ -117,8 +123,8 @@ void separateStr(string inp, string& id, string& name, string& birthday, float& 
 node_list* ReadFromFile();
 int amountStudent(node* l);
 void student_with_max_point(node* l);
-string printDate(DATE d);
-string printName(NAME n);
+void printDate(DATE d);
+void printName(NAME n);
 void printInfo(node* d);
 void printList(node_list* l);
 #pragma endregion
@@ -167,7 +173,11 @@ void WriteToFile(node* l) {
 	node* p = l;
 	while (p != NULL)
 	{
-		fileOutput << p->Data.idStu << " " << printName(p->Data.nameStu) << " " << printDate(p->Data.birthday) << " " << p->Data.point << endl;
+		fileOutput << p->Data.idStu << " ";
+		printName(p->Data.nameStu);
+		fileOutput << strName << " ";
+		printDate(p->Data.birthday);
+		fileOutput << strDay << " " << p->Data.point << endl;
 		p = p->next;
 	}
 	fileOutput.close();
@@ -202,6 +212,7 @@ void separateStr(string inp, string& id, string& name, string& birthday, float& 
 	ss << temp[temp.size() - 1];
 	ss >> point;
 }
+
 node_list* ReadFromFile() {
 	string id, name;
 	string birthday = "";
@@ -254,7 +265,11 @@ void student_with_max_point(node* l) {
 	{
 		if (p->Data.point == max)
 		{
-			fileOutput << p->Data.idStu << " " << printName(p->Data.nameStu) << " " << printDate(p->Data.birthday) << " " << p->Data.point << endl;
+			fileOutput << p->Data.idStu << " ";
+			printName(p->Data.nameStu);
+			fileOutput << strName << " ";
+			printDate(p->Data.birthday);
+			fileOutput << strDay << " " << p->Data.point << endl;
 		};
 		p = p->next;
 	}
@@ -271,30 +286,68 @@ void sortPoint(node_list* l) {
 		{
 			if (temp->Data.point > tmp->Data.point)
 			{
-				float p = temp->Data.point;
-				temp->Data.point = tmp->Data.point;
-				tmp->Data.point = p;
+				St p = temp->Data;
+				temp->Data = tmp->Data;
+				tmp->Data = p;
 			}
 			tmp = tmp->next;
 		};
 		temp = temp->next;
 	};
+
+	temp = l->head;
+	while (temp != NULL)
+	{
+		fileOutput << temp->Data.idStu << " ";
+		printName(temp->Data.nameStu);
+		fileOutput << strName << " ";
+		printDate(temp->Data.birthday);
+		fileOutput << strDay << " " << temp->Data.point << endl;
+
+		temp = temp->next;
+	}
 }
 
 void sortName(node_list* l) {
+	node* p = l->head;
 
+	while (p != NULL)
+	{
+		node* temp = p->next;
+		while (temp != NULL)
+		{
+			if (p->Data.nameStu.fName > temp->Data.nameStu.fName)
+			{
+				St s = p->Data;
+				p->Data = temp->Data;
+				temp->Data = s;
+			};
+			temp = temp->next;
+		};
+		p = p->next;
+	}
 }
 
-string printDate(DATE d) {
-	return to_string(d.day) + "/" + to_string(d.month) + "/" + to_string(d.year);
+void printDate(DATE d) {
+	cout << setw(3) << right << d.day;
+	cout << setw(3) << right << d.month;
+	cout << setw(5) << right << d.year;
+	strDay = to_string(d.day) + " " + to_string(d.month) + " " + to_string(d.year);
 }
 
-string printName(NAME n) {
-	return n.lName + " " + n.mName + n.fName;
+void printName(NAME n) {
+	cout << setw(8) << left << n.lName;
+	cout << setw(16) << left << n.mName;
+	cout << setw(8) << left << n.fName;
+	strName = n.lName + " " + n.mName + " " + n.fName;
 }
 
 void printInfo(node* d) {
-	cout << d->Data.idStu << " " << printName(d->Data.nameStu) << " " << printDate(d->Data.birthday) << " " << d->Data.point << endl;
+
+	cout << setw(15) << left << d->Data.idStu;
+	printName(d->Data.nameStu);
+	printDate(d->Data.birthday);
+	cout << setw(4) << right << d->Data.point << endl;
 }
 
 void printList(node_list* l) {
@@ -307,7 +360,7 @@ void printList(node_list* l) {
 }
 int main() {
 	node_list* l = ReadFromFile();
-	sortPoint(l);
+	sortName(l);
 	printList(l);
 	return 0;
 }
