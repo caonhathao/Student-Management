@@ -5,30 +5,38 @@
 #include<string>
 #include<iomanip>
 
+using std::cin;
+using std::cout;
 using std::setw;
 using std::left;
 using std::right;
-using std::cin;
-using std::cout;
-using std::string;
+using std::endl;
 using std::to_string;
+using std::find;
+using std::string;
 using std::stringstream;
 using std::vector;
-using std::endl;
+using std::ios;
 using std::ofstream;
 using std::ifstream;
-using std::ios;
 
 ofstream fileOutput("Data_OUT.txt", ios::out);
 ifstream fileInput("Data_INP.txt", ios::in);
 
 string strName, strDay = "";
-
+#pragma region checkingFuncs
+bool isLeapYear(int y);
+bool validDay(int d, int m, int y);
+bool validMonth(int m);
+bool validYear(int y);
+bool isIDEsixt(node_list* l, string mID);
+#pragma endregion
 struct DATE {
 	int day = 0;
 	int month = 0;
 	int year = 0;
 	DATE() {};
+
 	DATE(string date) {
 		string tmp[3] = {};
 		int k = 0;
@@ -44,16 +52,31 @@ struct DATE {
 			}
 		};
 		stringstream ss;
-		ss << tmp[0];
-		ss >> day;
+		ss << tmp[2];
+		ss >> year;
+		while (validYear(year) == false)
+		{
+			cout << "WRONG FORMAT! PLEASE WRITE AGAIN!";
+			cin >> year;
+		}
 
 		ss.clear();
 		ss << tmp[1];
 		ss >> month;
+		while (validMonth(month) == false)
+		{
+			cout << "WRONG FORMAT! PLEASE WRITE AGAIN!";
+			cin >> month;
+		}
 
 		ss.clear();
-		ss << tmp[2];
-		ss >> year;
+		ss << tmp[0];
+		ss >> day;
+		while (validDay(day, month, year) == false)
+		{
+			cout << "WRONG FORMAT! PLEASE WRITE AGAIN!";
+			cin >> day;
+		}
 	}
 };
 
@@ -113,22 +136,106 @@ struct node_list {
 	node* head = NULL;
 	node* tail = NULL;
 };
-
 #pragma region listFuncs
 node* init_node(St a);
 node_list* add_new_node(node_list* l, St a);
 node_list* init_list();
-void WriteToFile(node* l);
-void separateStr(string inp, string& id, string& name, string& birthday, float& point);
 node_list* ReadFromFile();
+
+void WriteToFile(node* l);
 int amountStudent(node* l);
 void student_with_max_point(node* l);
+
+void sortPoint(node_list* l);
+void sortByName(node_list* l);
+void sortByID(node_list* l);
+
+void separateStr(string inp, string& id, string& name, string& birthday, float& point);
+
+node* findStuByID(node_list* l, string ID);
+
 void printDate(DATE d);
 void printName(NAME n);
 void printInfo(node* d);
 void printList(node_list* l);
 #pragma endregion
 
+#pragma region checkingEvent
+bool isLeapYear(int y) {
+	if (y % 100 == 0)
+	{
+		if (y % 400 == 0)
+		{
+			return true;
+		}
+		else return false;
+	}
+	else if (y % 4 == 0)
+	{
+		return true;
+	}
+	else return false;
+}
+bool validYear(int m) {
+	if (m < 0)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+};
+bool validMonth(int m) {
+	if (m < 0 || m>12)
+	{
+		return false;
+	}
+	else return true;
+};
+bool validDay(int d, int m, int y) {
+	if (m == 1 || m == 3 || m == 5 || m == 7 || m == 8 || m == 10 || m == 12)
+	{
+		if (d < 0 || d>31)
+		{
+			return false;
+		}
+		else return true;
+	}
+	else if (m == 2)
+	{
+		if (isLeapYear(y)) {
+			if (d < 0 || d>29)
+			{
+				return false;
+			}
+			else return true;
+		}
+		else if (d < 0 || d>28)
+		{
+			return false;
+		}
+		else return true;
+
+	}
+	else if (d < 0 || d>30)
+	{
+		return false;
+	}return true;
+}
+bool isIDEsixt(node_list* l, string mID) {
+	node* p = l->head;
+	while (p != NULL) {
+		if (p->Data.idStu == mID)
+		{
+			return true;
+		}
+	};
+	return false;
+}
+#pragma endregion
+
+#pragma region buildSLL
 node* init_node(St a) {
 	node* p = new node;
 	p->Data = a;
@@ -153,7 +260,6 @@ node_list* init_list() {
 	float point = 0.0;
 
 	cin >> id >> name >> birthday >> point;
-
 	St a = St(id, NAME(name), DATE(birthday), point);
 	node_list* l = new node_list;
 	l->head = init_node(a);
@@ -238,10 +344,12 @@ node_list* ReadFromFile() {
 	fileInput.close();
 	return l;
 }
+#pragma endregion
 
+#pragma region features
 int amountStudent(node* l) {
 	node* p = l;
-	int count = 0;
+	int count(0);
 	while (p != NULL) {
 		count += 1;
 	};
@@ -276,6 +384,20 @@ void student_with_max_point(node* l) {
 	fileOutput.close();
 };
 
+node* findStuByID(node_list* l, string ID) {
+	node* p = l->head;
+	while (p != NULL)
+	{
+		if (p->Data.idStu == ID)
+		{
+			return p;
+		}
+	};
+	return NULL;
+}
+#pragma endregion
+
+#pragma region sort
 void sortPoint(node_list* l) {
 	node* temp = l->head;
 
@@ -308,7 +430,7 @@ void sortPoint(node_list* l) {
 	}
 }
 
-void sortName(node_list* l) {
+void sortByName(node_list* l) {
 	node* p = l->head;
 
 	while (p != NULL)
@@ -328,6 +450,27 @@ void sortName(node_list* l) {
 	}
 }
 
+void sortByID(node_list* l) {
+	node* p = l->head;
+	node* nStep = l->head->next;
+	while (p != NULL)
+	{
+		while (nStep != NULL)
+		{
+			if (p->Data.idStu > nStep->Data.idStu)
+			{
+				St temp = p->Data;
+				p->Data = nStep->Data;
+				nStep->Data = temp;
+			};
+			nStep = nStep->next;
+		}
+		p = p->next;
+	}
+}
+#pragma endregion
+
+#pragma region print
 void printDate(DATE d) {
 	cout << setw(3) << right << d.day;
 	cout << setw(3) << right << d.month;
@@ -358,9 +501,10 @@ void printList(node_list* l) {
 		p = p->next;
 	};
 }
+#pragma endregion
 int main() {
 	node_list* l = ReadFromFile();
-	sortName(l);
+	sortByName(l);
 	printList(l);
 	return 0;
 }
