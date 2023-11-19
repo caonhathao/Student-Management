@@ -6,22 +6,7 @@
 #include<iomanip>
 #include<algorithm>
 
-using std::cin;
-using std::cout;
-using std::setw;
-using std::left;
-using std::right;
-using std::endl;
-using std::to_string;
-using std::find;
-using std::stoi;
-using std::toupper;
-using std::string;
-using std::stringstream;
-using std::vector;
-using std::ios;
-using std::ofstream;
-using std::ifstream;
+using namespace std;
 
 ofstream fileOutput("Data_OUT.txt", ios::out);
 ifstream fileInput("Data_INP.txt", ios::in);
@@ -263,6 +248,8 @@ vector<node*> findStuByName(node_list* l, string name);
 void removeStuByID(node_list* l, string ID);
 void removeStuByName(node_list* l, string ID);
 void addNewStudent(node_list* l);
+void editInfoStudent(node_list* l);
+void destroy(node_list* l);
 
 void printDate(DATE d);
 void printName(NAME n);
@@ -617,6 +604,57 @@ void addNewStudent(node_list* l) {
 		p = p->next;
 	}
 }
+
+void editInfoStudent(node_list* l) {
+	system("cls");
+	string sID = "";
+	cout << "Enter Student's ID: ";
+	cin >> sID;
+
+	node* p = l->head;
+	while (p != nullptr)
+	{
+		if (p->Data.idStu == sID)
+		{
+			break;
+		}
+	};
+
+	if (p == nullptr)
+	{
+		cout << "WRONG ACCESS: ID DOES NOT EXIST!";
+		return;
+	}
+	else {
+		cout << "Enter new info ( If it has no change, just enter '0'):" << '\n';
+
+		string birthday, point = "";
+		cout << "Birthday: ";
+		cin >> birthday;
+		cout << "Point: ";
+		cin >> point;
+
+		if (birthday != "0")
+		{
+			p->Data.birthday = DATE(birthday);
+		};
+		if (point != "0")
+		{
+			p->Data.point = stof(point);
+		}
+	};
+}
+
+void destroy(node_list* l) {
+	node* p =  nullptr;
+	while (l->head != nullptr)
+	{
+		p = l->head->next;
+		delete l->head;
+		l->head = p;
+	};
+	delete l;
+}
 #pragma endregion
 
 #pragma region sort
@@ -725,13 +763,12 @@ void printList(node_list* l) {
 //CD002131001 NGUYEN DUY KHOI 12/12/2003 8.3
 //CD004001001 TRAN NGUYEN TRUNG KIEN 23/11/2004 8.5
 int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+
 	node_list* l = ReadFromFile();
-	sortByID(l);
-	printList(l);
-	cout << endl;
-	addNewStudent(l);
-	cout << endl;
-	WriteToFile(l);
-	printList(l);
+	destroy(l);
+	
+	cout << l;
 	return 0;
 }
