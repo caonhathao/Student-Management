@@ -58,7 +58,7 @@ struct DATE {
 			cout << "WRONG MONTH'S FORMAT! PLEASE WRITE AGAIN!";
 			cin >> month;
 		};
-		if (month.size()<2)
+		if (month.size() < 2)
 		{
 			month = "0" + month;
 		}
@@ -71,7 +71,7 @@ struct DATE {
 			cout << "WRONG DAY'S FORMAT! PLEASE WRITE AGAIN!";
 			cin >> day;
 		};
-		if (day.size()<2)
+		if (day.size() < 2)
 		{
 			day = "0" + day;
 		}
@@ -240,13 +240,18 @@ void sortPoint(node_list* l);
 void sortByName(node_list* l);
 void sortByID(node_list* l);
 
+void swap(node* a, node* b);
+void selectionSort(node_list* l, string o);
+
 void separateStr(string inp, string& id, string& name, string& birthday, float& point);
 bool compare(St a, St b);
 
 node* findStuByID(node_list* l, string ID);
 vector<node*> findStuByName(node_list* l, string name);
+
 void removeStuByID(node_list* l, string ID);
 void removeStuByName(node_list* l, string ID);
+
 void addNewStudent(node_list* l);
 void editInfoStudent(node_list* l);
 void destroy(node_list* l);
@@ -646,7 +651,7 @@ void editInfoStudent(node_list* l) {
 }
 
 void destroy(node_list* l) {
-	node* p =  nullptr;
+	node* p = nullptr;
 	while (l->head != nullptr)
 	{
 		p = l->head->next;
@@ -654,6 +659,54 @@ void destroy(node_list* l) {
 		l->head = p;
 	};
 	delete l;
+}
+#pragma endregion
+
+#pragma region features:selectionSort
+void swap(node* a, node* b) {
+	St temp = a->Data;
+	a->Data = b->Data;
+	b->Data = temp;
+};
+void selectionSort(node_list* l, string o) {
+	node* i = l->head;
+	node* j = i->next;
+	node* min = nullptr;
+	while (i != nullptr)
+	{
+		min = i;
+		j = i->next;
+		while (j != nullptr)
+		{
+			if (o == "point")
+			{
+				if (min->Data.point > j->Data.point)
+				{
+					min = j;
+				}
+			}
+			else if (o == "name")
+			{
+				if (min->Data.nameStu.fName > j->Data.nameStu.fName)
+				{
+					min = j;
+				}
+			}
+			else if (o == "id")
+			{
+				if (compare(min->Data, j->Data))//increase
+				{
+					min = j;
+				}
+			}
+			j = j->next;
+		};
+		if (min != i)
+		{
+			swap(min, i);
+		};
+		i = i->next;
+	};
 }
 #pragma endregion
 
@@ -767,8 +820,8 @@ int main() {
 	cin.tie(NULL);
 
 	node_list* l = ReadFromFile();
-	destroy(l);
 	
-	cout << l;
+	selectionSort(l, "id");
+	printList(l);
 	return 0;
 }
