@@ -109,7 +109,7 @@ struct NAME {
 			mName += tmp[i] + ' ';
 		};
 		fName = tmp[tmp.size() - 1];
-		fullName = lName + " " + mName + " " + fName;
+		fullName = lName + " " + mName + fName;
 	}
 };
 
@@ -327,6 +327,32 @@ void WriteToFile(node_list* l) {
 	fileOutput.close();
 }
 
+node_list* ReadFromFile() {
+	string id, name;
+	string birthday = "";
+	float point;
+
+	string t = "";
+	getline(fileInput, t);
+	separateStr(t, id, name, birthday, point);
+
+	St a = St(id, NAME(name), DATE(birthday), point);
+	node_list* l = new node_list;
+	l->head = init_node(a);
+	l->tail = l->head;
+
+	node_list* p = l;
+
+	while (!fileInput.eof()) {
+		getline(fileInput, t);
+		separateStr(t, id, name, birthday, point);
+		a = St(id, NAME(name), DATE(birthday), point);
+		p = add_new_node(p, a);
+	};
+	fileInput.close();
+	return l;
+}
+
 void separateStr(string inp, string& id, string& name, string& birthday, float& point) {
 	vector<string>temp = {};
 	string tmp = "";
@@ -370,32 +396,6 @@ bool compare(St a, St b) {
 		}
 	};
 	return false;
-}
-
-node_list* ReadFromFile() {
-	string id, name;
-	string birthday = "";
-	float point;
-
-	string t = "";
-	getline(fileInput, t);
-	separateStr(t, id, name, birthday, point);
-
-	St a = St(id, NAME(name), DATE(birthday), point);
-	node_list* l = new node_list;
-	l->head = init_node(a);
-	l->tail = l->head;
-
-	node_list* p = l;
-
-	while (!fileInput.eof()) {
-		getline(fileInput, t);
-		separateStr(t, id, name, birthday, point);
-		a = St(id, NAME(name), DATE(birthday), point);
-		p = add_new_node(p, a);
-	};
-	fileInput.close();
-	return l;
 }
 #pragma endregion
 
@@ -823,5 +823,7 @@ int main() {
 	
 	selectionSort(l, "id");
 	printList(l);
+	WriteToFile(l);
+	destroy(l);
 	return 0;
 }
